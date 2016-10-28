@@ -1,0 +1,49 @@
+body {
+  font-family : 'Roboto',
+                Arial;
+  font-size   : 1.3em;
+
+}
+
+hr {
+  margin-top    : 55px;
+  margin-bottom : 50px;
+}
+
+h1 {
+  font-style  : italic;
+  font-weight : 400;
+}
+
+h2 {
+  font-weight : 400;
+}
+
+p {
+  font-size : 0.7em;
+}
+
+button {
+
+  color            : white;
+  border           : 1px rgb(160, 160, 160) solid;
+  background-color : rgb(20, 20, 20);
+  text-transform   : uppercase;
+  margin-bottom  : 10px;
+  padding        : 10px 20px;
+  border-radius  : 5px;
+  font-size      : 0.9em;
+  font-weight    : 300;
+  letter-spacing : 1px;
+}
+
+/*----------specific to Smapon -----------*/
+
+
+input {font-size: 1.1em;}
+
+#touchtable {
+  position:absolute;
+  left:150px;
+  top:150px;
+}

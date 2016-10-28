@@ -1,0 +1,77 @@
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <script src="https://use.fontawesome.com/349cc34bf4.js"></script>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="script.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+
+
+    <style>
+
+
+    #mainContent {
+      width   : 320px;
+      margin  : auto;
+      padding : 20px;
+    }
+
+
+    table {
+      border-collapse: collapse;
+
+    }
+    tr, th, table{
+
+      margin:0;
+      padding:0;
+      border:0;
+
+    }
+    th {
+      border:1px solid rgb(184, 184, 184);
+    }
+
+    .tableth {
+      width:16px;
+      height:16px;
+
+    }
+
+  </style>
+
+
+</head>
+<body onload="onPageLoad()">
+
+  <h2>Functions list</h2>
+  <h4>generateTable(nb_of_squares,destination_div,class_name)</h4>
+  <p>
+
+  </p>
+  <input id="nb_of_squares_input" type="number" min="4" max="64" value="8"/> Squares
+  <br />
+  <button onclick="generateTable(document.getElementById('nb_of_squares_input').value,'generateTableTestDiv','tableth')">Generate table</button>
+    </p>
+    <div id="generateTableTestDiv" style="border:1px grey solid;width:300px;">
+    (destination div)
+
+  </div>
+  <hr />
+<div id="mainContent">
+<hr/>
+This is for Smapon.
+
+    <div id="tablediv">
+    </div>
+<hr />
+This is for hoomans.
+    <div id="PREVIEWtablediv">
+    </div>
+
+</div>
+</body>
+</html>
