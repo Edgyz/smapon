@@ -4,63 +4,53 @@
 // Global Functions
 // ------------------------
 
+function appIntro(){
 
-function onPageLoad(pagename) {
-  if (pagename =='functions') {
 
-    generateTable(8,'tablediv','tableth');
-    generateTable(8,'PREVIEWtablediv','tableth preview');
-    addSomeColor();
-    touchSensing('toucharea');
-  } else if (pagename =='index') {
+  function checkDeviceScreenSize()
+  {
+    //maybe?
+  }
 
-      generateTable(8,'tablediv','tableth',true);
-      touchSensing('toucharea');
-      addSomeColor();
-    } else {}};
 
+  var intro = Object.create(protoPage);
+  intro.name = 'intro';
+
+  var main = Object.create(protoPage);
+  intro.name = 'main';
+
+  var functions = Object.create(protoPage);
+  intro.name = 'functions';
+
+  intro.init();
+
+    var sup = Object.create(protoTable);
+    sup.generateTable();
+
+}
 
 
 function generateTable(nb_of_squares,destination_div,class_name,follow_touch){
 //follow_touch is a bool - decides if the table will move with touch inputs
 //if left out if it well default to false
 
+
+//checking for touch, defaulting to false
 if (typeof follow_touch == 'undefined') {
 follow_touch == false;
 }
 
-console.log(follow_touch);
-
-
-
-  function generateTh(nb_of_th,current_row){
-  var generatedTh ='';
-    for (var i = 0; i < nb_of_th; i++) {
-      generatedTh += '<th class="'+class_name+' x'+i+' y'+current_row+'"></th>';
-    }
-    return(generatedTh);
+function generateTh(nb_of_th,current_row){
+var generatedTh ='';
+for (var i = 0; i < nb_of_th; i++) {
+    generatedTh += '<th class="'+class_name+' x'+i+' y'+current_row+'"></th>';
+}
+  return(generatedTh);
   }
 
-
-  //
-  // function changeSize(name_of_class,px_size){
-  //   var newSize = String(px_size) + 'px';
-  //   var thArray = document.getElementsByClassName(name_of_class);
-  //   for (var i = 0; i < thArray.length; i++) {
-  //     thArray[i].style.width = newSize;
-  //     thArray[i].style.height = newSize;
-  //
-  //   }
-  // }
-
-
-  // MAIN FUNCTION
-  //-----------------------
-
-  console.log(nb_of_squares);
   if (follow_touch) {
     var myTable ='<table id="touchtable">';
-    touchSensing
+
   } else {
   var myTable ='<table>'; }
 
@@ -253,6 +243,79 @@ function process_touchend(){
 // ------------------------
 // Global Vars
 // ------------------------
+var protoPage =
+{
+name: '',
+touchEnabledDiv:'toucharea',
+makeTable: true,
+tableDivId: 'tablediv',
+tableThClass: 'tableth',
+tableSize: 8,
+isTouchable: function() {
+              if(this.touchEnabledDiv){
+                return(true);}
+              else{
+                return(false);}},
+init:
+  function()
+  {
+        if(this.makeTable)
+        {
+          generateTable(this.tableSize,this.tableDivId,this.tableThClass,this.isTouchable());
+        }
+        addSomeColor();
+        touchSensing(this.touchEnabledDiv);
+  }
+}
+
+
+var protoTable =
+{
+name: '',
+touchArea:'toucharea',
+tableContainerId: 'tablediv',
+tableId: 'mytable',
+tableThClass: 'square',
+tableSize: 8,
+pixelSize: 18,
+      generateTable:
+      function generateTable(){
+
+      //checking for touch, defaulting to false
+      if (this.touchArea == '') {
+      }
+
+      function generateTh(nb_of_th,current_row){
+      var generatedTh ='';
+      for (var i = 0; i < nb_of_th; i++) {
+          generatedTh += '<th class="'+this.tableThClass+' x'+i+' y'+current_row+'"></th>';
+      }
+        return(generatedTh);
+        }
+
+          var myTable ='<table id="'+this.tableId+'">';
+
+        for (var i = 0; i < this.tableSize; i++) {
+          myTable += '<tr class="row'+i+'">';
+          myTable += generateTh(this.tableSize,i);
+          myTable += "</tr>";
+        }
+        myTable += "</table>";
+        var myID = this.tableContainerId;
+        console.log(myID);
+        document.getElementById(myID).innerHTML = myTable;
+
+        function resizingSquares(){
+          var mySquares = document.getElementsByClassName(this.tableThClass);
+          for (var i = 0; i < mySquares.length; i++) {
+            var stringPixel = pixelSize.toString() + 'px';
+            mySquares[i].style.width = stringPixel;
+            mySquares[i].style.height = stringPixel;
+          }
+        // changeSize('tableth',px_size);)
+      }
+}}
+
 
 
 var arrayGrid =
