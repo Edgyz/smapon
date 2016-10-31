@@ -98,40 +98,35 @@ eyesopen:
 
   var mySmapon = {};
 
-  mySmapon.routine =function(routineName){ //i.e. 'idle'
-
+  mySmapon.routine =
+  function(routineName){ //i.e. 'idle'
     this.animate(routineAnimList[routineName]);
-
   };
 
-  mySmapon.animate = function(animList){
+  mySmapon.animate =
+  function(animList){
 
     if(animList.length >= 1){
         setNewPattern(facePatterns[animList[0]]);
-
         setTimeout(function(){nextFrame(animList,0);},ANIMATION_INTERVAL);
-
     }
     else {
       setNewPattern(facePatterns[animList[0]]);
-
-
     }
   };
 
   function nextFrame(animList,currentframe){
-console.log("length" + animList.length);
-    var nextpattern = 0;
+    var nextframe = 0;
     if (currentframe == animList.length-1) {
       console.log("nextframe");
-      nextpattern = 0;
-    } else{ nextpattern = currentframe +1;
-    console.log("next"+nextpattern);}
+      nextframe = 0;
+    } else{ nextframe = currentframe +1;
+    console.log("next"+nextframe);}
 
-    setNewPattern(facePatterns[animList[nextpattern]]);
-    console.log("set"+facePatterns[animList[nextpattern]]);
+    setNewPattern(facePatterns[animList[nextframe]]);
+    console.log("set"+facePatterns[animList[nextframe]]);
 
-    setTimeout(function(){nextFrame(animList,nextpattern);},ANIMATION_INTERVAL);
+    setTimeout(function(){nextFrame(animList,nextframe);},ANIMATION_INTERVAL);
 
   }
 
