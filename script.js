@@ -68,9 +68,8 @@ function process_touchmove(evt){
   for (var i = 0; i < touches.length; i++) {
     //Start triangulation once we get 3 touch points
     if (i>1) {
-      var topPoint = findTopPointandAngle(touches);
-      moveTableTo(topPoint.screenX, topPoint.screenY);
-
+      var placementData = findTopPointandAngle(touches);
+      moveTableTo(placementData[0].screenX, placementData[0].screenY,placementData[1]);
 
     }
   }}
@@ -109,22 +108,37 @@ function process_touchmove(evt){
     Lsquare = Math.pow(pointA.posX - pointC.posX,2);
     lsquare = Math.pow(pointA.posY - pointC.posY,2);
      var distAC = Math.round(Math.sqrt(Lsquare+lsquare));
+     var result = [];
 
      if (distAB <= distBC && distAB <= distAC) {
-       result = touchesArray[2];
+       result[0] = touchesArray[2];
+       result[1] = findAngleABC(pointA,pointB);
+
+
      } else if (distBC <= distAC && distBC <= distAB) {
-       result = touchesArray[0];
-     } else if (distAB <= distAC && distAB <= distBC) {
-       result = touchesArray[1];
+       result[0] = touchesArray[0];
+       result[1] = findAngleABC(pointB,pointC);
+
+
+     } else if (distAC <= distAB && distAC <= distBC) {
+       result[0] = touchesArray[1];
+       result[1] = findAngleABC(pointA,pointC);
+
+
+
      }
 
 return(result);
+
 }
 
 
 
-function findAngleABC(pointA,pointB,pointC){
+function findAngleABC(pointA,pointB){
 
+    var Opp = pointA.posY-pointB.posY;
+  var Adj = pointA.posX-pointB.posX;
+return(Math.atan(Opp/Adj)*180/Math.PI);
 }
 
 
@@ -164,11 +178,13 @@ for (var i = 0; i < nb_of_th; i++) {
   }
 
 
-  function moveTableTo(xpos,ypos){
+  function moveTableTo(xpos,ypos,angle){
 
     var myTable = document.getElementById(SMAPON_TABLE_ID);
     myTable.style.left = String(xpos-90) + "px";
     myTable.style.top = String(ypos-60)+ "px";
+    myTable.style.transform = "rotate("+String(Math.round(angle))+"deg)";
+
   }
 
 
