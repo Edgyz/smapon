@@ -11,7 +11,7 @@ var TOUCH_LISTENER_DIV = 'toucharea';
 var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
-var ANIMATION_INTERVAL = 500;
+var ANIM_FREQ = 300;
 
 
   //color choices as follows:
@@ -42,7 +42,7 @@ function init() {
   generateTable();
   resizingSquares(20);
   moveTableTo((window.innerWidth/2),200,0);
-  setNewPattern(blueSmileFace);
+  setNewPattern(facePatterns.surprise);
   mySmapon.routine('idle');
   //Check for input for 3sec ?
   //
@@ -50,16 +50,31 @@ function init() {
   //   createSmapon();
   // }
 
-var poeu = ("for example there's an idle routine. During the idle routine, what happens ?");
 }
+
+
 //-----------------------------------------------------------------------
 //SMAPON
 //TBD But I think at the root level there might be stats (like hunger or whatever)
 // and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
+//
+// var routineAnimList =
+// { idle: ['smile','eyesclosed','smile','smile','smile'],
+//   smile: ['smile','eyesopen']
+// };
 
 var routineAnimList =
-{ idle: ['smile','eyesclosed','smile','smile','smile'],
-  smile: ['smile','eyesopen']
+{ idle:
+  [
+    {pattern:'smile',duration:2},
+    {pattern:'eyesclosed',duration:1},
+    {pattern:'smile',duration:4},
+    {pattern:'lookleft',duration:3},
+    {pattern:'smile',duration:2},
+    {pattern:'eyesclosed',duration:1},
+    {pattern:'lookright',duration:6},
+    {pattern:'smile',duration:3},
+  ]
 };
 
 var facePatterns =
@@ -73,6 +88,25 @@ var facePatterns =
       "  b  b  ",
       "   bb   ",
       "        "],
+  lookleft:
+     ["        ",
+      " b  b   ",
+      " b  b   ",
+      "        ",
+      "        ",
+      "  b  b  ",
+      "   bb   ",
+      "        "],
+    lookright:
+       ["        ",
+        "   b  b ",
+        "   b  b ",
+        "        ",
+        "        ",
+        "  b  b  ",
+        "   bb   ",
+        "        "],
+
   eyesclosed:
      ["        ",
       "        ",
@@ -91,6 +125,15 @@ eyesopen:
       "        ",
       "  bbbb  ",
       "        "],
+surprise:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "   bb   ",
+      "   bb   ",
+      "        "],
 
 
 
@@ -107,28 +150,32 @@ eyesopen:
   function(animList){
 
     if(animList.length >= 1){
-        setNewPattern(facePatterns[animList[0]]);
-        setTimeout(function(){nextFrame(animList,0);},ANIMATION_INTERVAL);
+
+      console.log(animList.pattern);
+        setNewPattern(facePatterns[animList[0].pattern]);
+        setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
     }
     else {
-      setNewPattern(facePatterns[animList[0]]);
+      setNewPattern(facePatterns[animList[0].pattern]);
     }
   };
 
   function nextFrame(animList,currentframe){
     var nextframe = 0;
-    if (currentframe == animList.length-1) {
-      console.log("nextframe");
+    if (currentframe == animList.length-1)
+    {
       nextframe = 0;
-    } else{ nextframe = currentframe +1;
-    console.log("next"+nextframe);}
+    }
 
-    setNewPattern(facePatterns[animList[nextframe]]);
-    console.log("set"+facePatterns[animList[nextframe]]);
+    else
+    {
+    nextframe = currentframe +1;
+    }
 
-    setTimeout(function(){nextFrame(animList,nextframe);},ANIMATION_INTERVAL);
+    setNewPattern(facePatterns[animList[nextframe].pattern]);
+    setTimeout(function(){nextFrame(animList,nextframe);},animList[nextframe].duration*ANIM_FREQ);
 
-  }
+}
 
 
 //-----------------------------------------------------------------------
