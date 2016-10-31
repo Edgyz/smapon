@@ -11,6 +11,7 @@ var TOUCH_LISTENER_DIV = 'toucharea';
 var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
+var ANIMATION_INTERVAL = 500;
 
 
   //color choices as follows:
@@ -26,6 +27,8 @@ var SMAPON_TABLE_ID = 'smapongrid';
     pink:'rgb(245, 10, 207)',
     none : 'rgb(0, 0, 0)'
     };
+
+
 //-----------------------------------------------------------------------
 //INITIALIZATION
 //Check screen size, generate the table and init Smapon
@@ -39,29 +42,97 @@ function init() {
   generateTable();
   resizingSquares(20);
   moveTableTo((window.innerWidth/2),200,0);
-  addSomeColor(blueSmileFace);
+  setNewPattern(blueSmileFace);
+  mySmapon.routine('idle');
   //Check for input for 3sec ?
   //
   // if(TouchedFor3sec() === true){
   //   createSmapon();
   // }
 
-
-
+var poeu = ("for example there's an idle routine. During the idle routine, what happens ?");
 }
 //-----------------------------------------------------------------------
 //SMAPON
 //TBD But I think at the root level there might be stats (like hunger or whatever)
 // and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
 
+var routineAnimList =
+{ idle: ['smile','eyesclosed','smile','smile','smile'],
+  smile: ['smile','eyesopen']
+};
+
+var facePatterns =
+{
+  smile:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "  b  b  ",
+      "   bb   ",
+      "        "],
+  eyesclosed:
+     ["        ",
+      "        ",
+      " bb  bb ",
+      "        ",
+      "        ",
+      "  b  b  ",
+      "   bb   ",
+      "        "],
+eyesopen:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "        ",
+      "  bbbb  ",
+      "        "],
+
+
+
+};
+
   var mySmapon = {};
-  mySmapon.routine ='idle';
-  mySmapon.animate = function(state){
-    setInterval(nextFrame(),1000);
+
+  mySmapon.routine =function(routineName){ //i.e. 'idle'
+
+    this.animate(routineAnimList[routineName]);
+
   };
 
-  function nextFrame(){
-    changeTablePatternTo('pattern1');
+  mySmapon.animate = function(animList){
+
+    if(animList.length >= 1){
+        setNewPattern(facePatterns[animList[0]]);
+
+        setTimeout(function(){nextFrame(animList,0);},ANIMATION_INTERVAL);
+
+    }
+    else {
+      setNewPattern(facePatterns[animList[0]]);
+
+
+    }
+  };
+
+  function nextFrame(animList,currentframe){
+console.log("length" + animList.length);
+    var nextpattern = 0;
+    if (currentframe == animList.length-1) {
+      console.log("nextframe");
+      nextpattern = 0;
+    } else{ nextpattern = currentframe +1;
+    console.log("next"+nextpattern);}
+
+    setNewPattern(facePatterns[animList[nextpattern]]);
+    console.log("set"+facePatterns[animList[nextpattern]]);
+
+    setTimeout(function(){nextFrame(animList,nextpattern);},ANIMATION_INTERVAL);
+
   }
 
 
@@ -81,16 +152,14 @@ var blueSmileFace=
     "        "
   ];
 
-function addSomeColor(patternArray){
+function setNewPattern(patternArray){
+  console.log(patternArray);
 for (var i = 0; i < TABLE_SIZE; i++) {
 
   for (var j = 0; j < TABLE_SIZE; j++) {
     if (patternArray[i][j] === ' ') {
       document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
     } else {
-      console.log(i+"et"+j);
-      console.log(COLORS_LIST);
-      console.log(patternArray);
 
     document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
     }
@@ -207,7 +276,6 @@ function generateTable(){
     myTable += "</tr>";
   }
   myTable += "</table>";
-  console.log(myTable);
   document.getElementById(TABLE_DIV).innerHTML = myTable;
   resizingSquares(SQUARE_PX_SIZE);
 }
