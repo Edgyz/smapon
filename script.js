@@ -12,6 +12,20 @@ var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
 
+
+  //color choices as follows:
+  var COLORS_LIST =
+    {
+    red:'rgb(245, 52, 10)',
+    o:'rgb(245, 137, 10)',
+    yellow:'rgb(245, 242, 10)',
+    green:'rgb(57, 245, 10)',
+    cyan:'rgb(10, 188, 245)',
+    b:'rgb(10, 69, 245)',
+    purple:'rgb(155, 10, 245)',
+    pink:'rgb(245, 10, 207)',
+    none : 'rgb(0, 0, 0)'
+    };
 //-----------------------------------------------------------------------
 //INITIALIZATION
 //Check screen size, generate the table and init Smapon
@@ -24,11 +38,15 @@ function init() {
   addTouchListeners(TOUCH_LISTENER_DIV);
   generateTable();
   resizingSquares(20);
+  moveTableTo((window.innerWidth/2),200,0);
+  addSomeColor(blueSmileFace);
+  //Check for input for 3sec ?
   //
-  // if(checkTouchInput()== true)
-  // {
+  // if(TouchedFor3sec() === true){
   //   createSmapon();
   // }
+
+
 
 }
 //-----------------------------------------------------------------------
@@ -36,46 +54,89 @@ function init() {
 //TBD But I think at the root level there might be stats (like hunger or whatever)
 // and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
 
+  var mySmapon = {};
+  mySmapon.routine ='idle';
+  mySmapon.animate = function(state){
+    setInterval(nextFrame(),1000);
+  };
 
-function createSmapon(){
-  var mySmapon = new Smapon();
-  mySmapon.launchStartRoutine();
+  function nextFrame(){
+    changeTablePatternTo('pattern1');
+  }
+
+
+//-----------------------------------------------------------------------
+//ANIMATION
+//Should this be inside Smapon? I'm lost.
+
+var blueSmileFace=
+  [
+    "        ",
+    "  b  b  ",
+    "  b  b  ",
+    "        ",
+    "        ",
+    "  b  b  ",
+    "   bb   ",
+    "        "
+  ];
+
+function addSomeColor(patternArray){
+for (var i = 0; i < TABLE_SIZE; i++) {
+
+  for (var j = 0; j < TABLE_SIZE; j++) {
+    if (patternArray[i][j] === ' ') {
+      document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
+    } else {
+      console.log(i+"et"+j);
+      console.log(COLORS_LIST);
+      console.log(patternArray);
+
+    document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
+    }
+  }
+}
+
+
 }
 
 
 //-----------------------------------------------------------------------
 //TOUCH SENSORS
 //Adding listeners, processing events (placing the grid at the right spot)
-//TO DO: Add rotation to the grid (!?)
 
 function addTouchListeners(divName) {
   document.getElementById(divName).addEventListener("touchstart",process_touchstart,false);
   document.getElementById(divName).addEventListener("touchmove",process_touchmove,false);
   document.getElementById(divName).addEventListener("touchend",process_touchend,false);
-  debugMode("Touch Listeners added to "+divName);
 }
 
-function process_touchstart(evt){evt.preventDefault();}
+function process_touchstart(evt){
 
-function process_touchend(evt){evt.preventDefault();}
+  evt.preventDefault();
+
+}
+
+function process_touchend(evt){evt.preventDefault();
+    NEW_TIMER = true;
+
+}
 
 function process_touchmove(evt){
   evt.preventDefault();
   var touches = evt.changedTouches;
-  var talkingabouttouches = '';
-  var highesttouch=0;
 
   for (var i = 0; i < touches.length; i++) {
     //Start triangulation once we get 3 touch points
     if (i>1) {
-      var placementData = findTopPointandAngle(touches);
+
+      var placementData = findRefPointandAngle(touches);
       moveTableTo(placementData[0].screenX, placementData[0].screenY,placementData[1]);
 
-    }
-  }}
-  function checkTouchInput() {
 
+    }
   }
+}
 
   //////
 
@@ -84,13 +145,8 @@ function process_touchmove(evt){
 
   //check distance between each point
   //place grid relative to the furthest one (top)
-  var sampleTouches = [];
-  sampleTouches[0] = {screenX:'100',screenY:'340'};
-  sampleTouches[1] = {screenX:'250',screenY:'390'};
-  sampleTouches[2] = {screenX:'360',screenY:'220'};
 
-  function findTopPointandAngle(touchesArray){
-    var dist=[];
+  function findRefPointandAngle(touchesArray){
     var angle=0;
 
     var pointA = {posX : touchesArray[0].screenX,posY : touchesArray[0].screenY};
@@ -108,26 +164,24 @@ function process_touchmove(evt){
     Lsquare = Math.pow(pointA.posX - pointC.posX,2);
     lsquare = Math.pow(pointA.posY - pointC.posY,2);
      var distAC = Math.round(Math.sqrt(Lsquare+lsquare));
-     var result = [];
+
 
      if (distAB <= distBC && distAB <= distAC) {
-       result[0] = touchesArray[2];
-       result[1] = findAngleABC(pointA,pointB);
+       furthestPoint = touchesArray[2];
+       angle = findAngleABC(pointA,pointB);
 
 
      } else if (distBC <= distAC && distBC <= distAB) {
-       result[0] = touchesArray[0];
-       result[1] = findAngleABC(pointB,pointC);
+       furthestPoint = touchesArray[0];
+       angle = findAngleABC(pointB,pointC);
 
 
      } else if (distAC <= distAB && distAC <= distBC) {
-       result[0] = touchesArray[1];
-       result[1] = findAngleABC(pointA,pointC);
-
-
+       furthestPoint = touchesArray[1];
+       angle = findAngleABC(pointA,pointC);
 
      }
-
+var result = [furthestPoint,angle];
 return(result);
 
 }
@@ -135,7 +189,6 @@ return(result);
 
 
 function findAngleABC(pointA,pointB){
-
     var Opp = pointA.posY-pointB.posY;
   var Adj = pointA.posX-pointB.posX;
 return(Math.atan(Opp/Adj)*180/Math.PI);
@@ -154,6 +207,7 @@ function generateTable(){
     myTable += "</tr>";
   }
   myTable += "</table>";
+  console.log(myTable);
   document.getElementById(TABLE_DIV).innerHTML = myTable;
   resizingSquares(SQUARE_PX_SIZE);
 }
@@ -162,7 +216,7 @@ function generateTable(){
 function generateTh(nb_of_th,current_row){
 var generatedTh ='';
 for (var i = 0; i < nb_of_th; i++) {
-    generatedTh += '<th class="'+TABLE_TH_CSS_CLASS+' x'+i+' y'+current_row+'"></th>';
+    generatedTh += '<th class="'+TABLE_TH_CSS_CLASS+'" id="x'+i+'y'+current_row+'"></th>';
 }
   return(generatedTh);
   }
