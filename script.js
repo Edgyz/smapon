@@ -192,12 +192,14 @@ function init() {
   // checkScreenSize();
   // displayIntroContent();
 
-  addTouchListeners(TOUCH_LISTENER_DIV);
-
+      addTouchListeners(TOUCH_LISTENER_DIV);
       var mySmapopon = new Smapon.create('JeanClaude');
       mySmapopon.createGrid();
       mySmapopon.moveGrid();
       mySmapopon.setRoutineTo('blink');
+      mySmapopon.saySomethingVoice('konnichiwa,ヒューバート様.');
+      mySmapopon.saySomethingVoice('私,スマポントイイマス.');
+      mySmapopon.saySomethingVoice('おしり の なか に ゆび お いりますか? ');
   //Check for input for 3sec ?
   //
   // if(TouchedFor3sec() === true){
@@ -217,52 +219,51 @@ function init() {
 //   smile: ['smile','eyesopen']
 // };
 
-  var Smapon = {};
-  Smapon.create = function (name){
-    this.name = 'name';
+var Smapon = {};
+Smapon.create = function (name){
+  this.name = 'name';
   };
 
-    Smapon.create.prototype.createGrid = function() {
+Smapon.create.prototype.createGrid = function() {
 
 
-        var myTable ='<table id="'+SMAPON_TABLE_ID+'">';
+    var myTable ='<table id="'+SMAPON_TABLE_ID+'">';
 
-        for (var i = 0; i < TABLE_SIZE; i++) {
-          myTable += '<tr class="row'+i+'">';
-          myTable += generateTh(TABLE_SIZE,i);
-          myTable += "</tr>";
-        }
-        myTable += "</table>";
-        document.getElementById(TABLE_DIV).innerHTML = myTable;
-        resizingSquares(SQUARE_PX_SIZE);
+    for (var i = 0; i < TABLE_SIZE; i++) {
+      myTable += '<tr class="row'+i+'">';
+      myTable += generateTh(TABLE_SIZE,i);
+      myTable += "</tr>";
+    }
+    myTable += "</table>";
+    document.getElementById(TABLE_DIV).innerHTML = myTable;
+    resizingSquares(SQUARE_PX_SIZE);
 
-    };
+};
 
 
-      Smapon.create.prototype.resizeSquares = function(pxsize) {
-        resizingSquares(pxsize);
+  Smapon.create.prototype.resizeSquares = function(pxsize) {
+    resizingSquares(pxsize);
 
-      };
+  };
 
-      Smapon.create.prototype.moveGrid = function() {
+  Smapon.create.prototype.moveGrid = function() {
 
-          moveTableTo((window.innerWidth/2),200,0);
+      moveTableTo((window.innerWidth/2),200,0);
 
-      };
+  };
 
-      Smapon.create.prototype.setPatternTo = function(facePattern) {
+  Smapon.create.prototype.setPatternTo = function(facePattern) {
 
-          setNewPattern(facePatterns.surprise);
+      setNewPattern(facePatterns.surprise);
 
-      };
+  };
 
-      Smapon.create.prototype.setRoutineTo = function(routinename) {
+  Smapon.create.prototype.setRoutineTo = function(routinename) {
 
-          this.routine = routinename;
+      this.routine = routinename;
+      this.setAnimationTo(routineAnimList[routinename]);
 
-          this.setAnimationTo(routineAnimList[routinename]);
-
-      };
+  };
 
 
 
@@ -276,7 +277,20 @@ function init() {
     else {
       setNewPattern(facePatterns[animList[0].pattern]);
     }
-  };
+};
+
+
+Smapon.create.prototype.saySomethingVoice = function(something){
+  var msg = new SpeechSynthesisUtterance(something);
+
+  msg.volume = 1; // 0 to 1
+  msg.rate = 1; // 0.1 to 10
+  msg.pitch = 2; //0 to 2
+  msg.lang = 'ja';
+window.speechSynthesis.speak(msg);
+};
+
+
 
   function nextFrame(animList,currentframe){
     var nextframe = 0;
@@ -296,21 +310,10 @@ function init() {
 }
 
 
+
 //-----------------------------------------------------------------------
 //ANIMATION
 //Should this be inside Smapon? I'm lost.
-
-var blueSmileFace=
-  [
-    "        ",
-    "  b  b  ",
-    "  b  b  ",
-    "        ",
-    "        ",
-    "  b  b  ",
-    "   bb   ",
-    "        "
-  ];
 
 function setNewPattern(patternArray){
   console.log(patternArray);
