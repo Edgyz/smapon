@@ -1,6 +1,7 @@
-//missing:
+//TO DO:
 // adding a touch check all the time (setinterval?)
-// where would color functions be ?
+// merge setnewpattern & setNewPatternandTranslate into
+//one function and set translation on/off based on ISTRANSLATING
 
 //-----------------------------------------------------------------------
 //GLOBAL VARIABLES
@@ -13,6 +14,7 @@ var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
 var ANIM_FREQ = 300;
 var DEBUGMODE = true;
+var ISTRANSLATING = true;
 
   //color choices as follows:
   var COLORS_LIST =
@@ -283,11 +285,11 @@ Smapon.create.prototype.createGrid = function() {
   Smapon.create.prototype.setAnimationTo = function(animList){
     if(animList.length >= 1){
 
-      setNewPattern(facePatterns[animList[0].pattern]);
+      setNewPatternandTranslate(facePatterns[animList[0].pattern]);
       setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
     }
     else {
-      setNewPattern(facePatterns[animList[0].pattern]);
+      setNewPatternandTranslate(facePatterns[animList[0].pattern]);
     }
 };
 
@@ -316,7 +318,7 @@ window.speechSynthesis.speak(msg);
     nextframe = currentframe +1;
     }
 
-    setNewPattern(facePatterns[animList[nextframe].pattern]);
+    setNewPatternandTranslate(facePatterns[animList[nextframe].pattern]);
     setTimeout(function(){nextFrame(animList,nextframe);},animList[nextframe].duration*ANIM_FREQ);
 
 }
