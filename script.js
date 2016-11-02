@@ -11,6 +11,23 @@ var TOUCH_LISTENER_DIV = 'toucharea';
 var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
+var ANIM_FREQ = 300;
+
+
+  //color choices as follows:
+  var COLORS_LIST =
+    {
+    red:'rgb(245, 52, 10)',
+    o:'rgb(245, 137, 10)',
+    yellow:'rgb(245, 242, 10)',
+    green:'rgb(57, 245, 10)',
+    cyan:'rgb(10, 188, 245)',
+    b:'rgb(10, 69, 245)',
+    purple:'rgb(155, 10, 245)',
+    pink:'rgb(245, 10, 207)',
+    none : 'rgb(0, 0, 0)'
+    };
+
 
 //-----------------------------------------------------------------------
 //INITIALIZATION
@@ -24,59 +41,213 @@ function init() {
   addTouchListeners(TOUCH_LISTENER_DIV);
   generateTable();
   resizingSquares(20);
+  moveTableTo((window.innerWidth/2),200,0);
+  setNewPattern(facePatterns.surprise);
+  mySmapon.routine('idle');
+  //Check for input for 3sec ?
   //
-  // if(checkTouchInput()== true)
-  // {
+  // if(TouchedFor3sec() === true){
   //   createSmapon();
   // }
 
 }
+
+
 //-----------------------------------------------------------------------
 //SMAPON
 //TBD But I think at the root level there might be stats (like hunger or whatever)
 // and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
+//
+// var routineAnimList =
+// { idle: ['smile','eyesclosed','smile','smile','smile'],
+//   smile: ['smile','eyesopen']
+// };
+
+var routineAnimList =
+{ idle:
+  [
+    {pattern:'smile',duration:2},
+    {pattern:'eyesclosed',duration:1},
+    {pattern:'smile',duration:4},
+    {pattern:'lookleft',duration:3},
+    {pattern:'smile',duration:2},
+    {pattern:'eyesclosed',duration:1},
+    {pattern:'lookright',duration:6},
+    {pattern:'smile',duration:3},
+  ]
+};
+
+var facePatterns =
+{
+  smile:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "  b  b  ",
+      "   bb   ",
+      "        "],
+  lookleft:
+     ["        ",
+      " b  b   ",
+      " b  b   ",
+      "        ",
+      "        ",
+      "  b  b  ",
+      "   bb   ",
+      "        "],
+    lookright:
+       ["        ",
+        "   b  b ",
+        "   b  b ",
+        "        ",
+        "        ",
+        "  b  b  ",
+        "   bb   ",
+        "        "],
+
+  eyesclosed:
+     ["        ",
+      "        ",
+      " bb  bb ",
+      "        ",
+      "        ",
+      "  b  b  ",
+      "   bb   ",
+      "        "],
+eyesopen:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "        ",
+      "  bbbb  ",
+      "        "],
+surprise:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "   bb   ",
+      "   bb   ",
+      "        "],
 
 
-function createSmapon(){
-  var mySmapon = new Smapon();
-  mySmapon.launchStartRoutine();
+
+};
+
+  var mySmapon = {};
+
+  mySmapon.routine =
+  function(routineName){ //i.e. 'idle'
+    this.animate(routineAnimList[routineName]);
+  };
+
+  mySmapon.animate =
+  function(animList){
+
+    if(animList.length >= 1){
+
+      console.log(animList.pattern);
+        setNewPattern(facePatterns[animList[0].pattern]);
+        setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
+    }
+    else {
+      setNewPattern(facePatterns[animList[0].pattern]);
+    }
+  };
+
+  function nextFrame(animList,currentframe){
+    var nextframe = 0;
+    if (currentframe == animList.length-1)
+    {
+      nextframe = 0;
+    }
+
+    else
+    {
+    nextframe = currentframe +1;
+    }
+
+    setNewPattern(facePatterns[animList[nextframe].pattern]);
+    setTimeout(function(){nextFrame(animList,nextframe);},animList[nextframe].duration*ANIM_FREQ);
+
+}
+
+
+//-----------------------------------------------------------------------
+//ANIMATION
+//Should this be inside Smapon? I'm lost.
+
+var blueSmileFace=
+  [
+    "        ",
+    "  b  b  ",
+    "  b  b  ",
+    "        ",
+    "        ",
+    "  b  b  ",
+    "   bb   ",
+    "        "
+  ];
+
+function setNewPattern(patternArray){
+  console.log(patternArray);
+for (var i = 0; i < TABLE_SIZE; i++) {
+
+  for (var j = 0; j < TABLE_SIZE; j++) {
+    if (patternArray[i][j] === ' ') {
+      document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
+    } else {
+
+    document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
+    }
+  }
+}
+
+
 }
 
 
 //-----------------------------------------------------------------------
 //TOUCH SENSORS
 //Adding listeners, processing events (placing the grid at the right spot)
-//TO DO: Add rotation to the grid (!?)
 
 function addTouchListeners(divName) {
   document.getElementById(divName).addEventListener("touchstart",process_touchstart,false);
   document.getElementById(divName).addEventListener("touchmove",process_touchmove,false);
   document.getElementById(divName).addEventListener("touchend",process_touchend,false);
-  debugMode("Touch Listeners added to "+divName);
 }
 
-function process_touchstart(evt){evt.preventDefault();}
+function process_touchstart(evt){
 
-function process_touchend(evt){evt.preventDefault();}
+  evt.preventDefault();
+
+}
+
+function process_touchend(evt){evt.preventDefault();
+    NEW_TIMER = true;
+
+}
 
 function process_touchmove(evt){
   evt.preventDefault();
   var touches = evt.changedTouches;
-  var talkingabouttouches = '';
-  var highesttouch=0;
 
   for (var i = 0; i < touches.length; i++) {
     //Start triangulation once we get 3 touch points
     if (i>1) {
-      var topPoint = findTopPointandAngle(touches);
-      moveTableTo(topPoint.screenX, topPoint.screenY);
+
+      var placementData = findRefPointandAngle(touches);
+      moveTableTo(placementData[0].screenX, placementData[0].screenY,placementData[1]);
 
 
     }
-  }}
-  function checkTouchInput() {
-
   }
+}
 
   //////
 
@@ -85,13 +256,8 @@ function process_touchmove(evt){
 
   //check distance between each point
   //place grid relative to the furthest one (top)
-  var sampleTouches = [];
-  sampleTouches[0] = {screenX:'100',screenY:'340'};
-  sampleTouches[1] = {screenX:'250',screenY:'390'};
-  sampleTouches[2] = {screenX:'360',screenY:'220'};
 
-  function findTopPointandAngle(touchesArray){
-    var dist=[];
+  function findRefPointandAngle(touchesArray){
     var angle=0;
 
     var pointA = {posX : touchesArray[0].screenX,posY : touchesArray[0].screenY};
@@ -110,21 +276,33 @@ function process_touchmove(evt){
     lsquare = Math.pow(pointA.posY - pointC.posY,2);
      var distAC = Math.round(Math.sqrt(Lsquare+lsquare));
 
-     if (distAB <= distBC && distAB <= distAC) {
-       result = touchesArray[2];
-     } else if (distBC <= distAC && distBC <= distAB) {
-       result = touchesArray[0];
-     } else if (distAB <= distAC && distAB <= distBC) {
-       result = touchesArray[1];
-     }
 
+     if (distAB <= distBC && distAB <= distAC) {
+       furthestPoint = touchesArray[2];
+       angle = findAngleABC(pointA,pointB);
+
+
+     } else if (distBC <= distAC && distBC <= distAB) {
+       furthestPoint = touchesArray[0];
+       angle = findAngleABC(pointB,pointC);
+
+
+     } else if (distAC <= distAB && distAC <= distBC) {
+       furthestPoint = touchesArray[1];
+       angle = findAngleABC(pointA,pointC);
+
+     }
+var result = [furthestPoint,angle];
 return(result);
+
 }
 
 
 
-function findAngleABC(pointA,pointB,pointC){
-
+function findAngleABC(pointA,pointB){
+    var Opp = pointA.posY-pointB.posY;
+  var Adj = pointA.posX-pointB.posX;
+return(Math.atan(Opp/Adj)*180/Math.PI);
 }
 
 
@@ -148,7 +326,7 @@ function generateTable(){
 function generateTh(nb_of_th,current_row){
 var generatedTh ='';
 for (var i = 0; i < nb_of_th; i++) {
-    generatedTh += '<th class="'+TABLE_TH_CSS_CLASS+' x'+i+' y'+current_row+'"></th>';
+    generatedTh += '<th class="'+TABLE_TH_CSS_CLASS+'" id="x'+i+'y'+current_row+'"></th>';
 }
   return(generatedTh);
   }
@@ -164,11 +342,13 @@ for (var i = 0; i < nb_of_th; i++) {
   }
 
 
-  function moveTableTo(xpos,ypos){
+  function moveTableTo(xpos,ypos,angle){
 
     var myTable = document.getElementById(SMAPON_TABLE_ID);
     myTable.style.left = String(xpos-90) + "px";
     myTable.style.top = String(ypos-60)+ "px";
+    myTable.style.transform = "rotate("+String(Math.round(angle))+"deg)";
+
   }
 
 
