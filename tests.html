@@ -13,11 +13,21 @@
 
     <style>
 
+    #debugdiv{
+      width:94%;
+      background-color: rgba(255, 255, 255, 0.5);
+      padding:1% 3%;
+      margin:auto;
+      font-size: 0.7em;
 
+    }
     #mainContent {
-      width   : 320px;
+
+      width   : 100%;
       margin  : auto;
-      padding : 20px;
+      background-image: url(bg.jpg);
+
+      background-size: 100% 100%;
     }
 
 
@@ -53,21 +63,19 @@
 </head>
 <body onload="init()">
   <div id="mainContent">
-    <div id="feedback" style="border:1px solid black;height:100px;">
-     <p id="debugdiv">
-
-dfsdfsdf
-       </p>
+    <div id="debugdiv">
+<p>
+  debug zone
+</p>
 
   </div>
-    <div id="toucharea" style="border:1px solid black;height:300px;">
+    <div id="toucharea">
 
     </div>
-<hr/>
     <div id="tablediv">
     </div>
 
-
+  </div>
         <button onclick="window.location.reload(true)">
           RELOAD PLZLZZZLZLZ
         </button>

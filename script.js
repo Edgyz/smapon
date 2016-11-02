@@ -12,7 +12,7 @@ var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
 var ANIM_FREQ = 300;
-
+var DEBUGMODE = true;
 
   //color choices as follows:
   var COLORS_LIST =
@@ -118,78 +118,79 @@ surprise:
 var translationGrid =
 {
   x0y0: 'x0y2',
-  x1y0: '',
-  x2y0: '',
-  x3y0: '',
-  x4y0: '',
-  x5y0: '',
-  x6y0: '',
-  x7y0: '',
-  x0y1: '',
-  x1y1: '',
-  x2y1: '',
-  x3y1: '',
-  x4y1: '',
-  x5y1: '',
-  x6y1: '',
-  x7y1: '',
-  x0y2: '',
-  x1y2: '',
-  x2y2: '',
-  x3y2: '',
-  x4y2: '',
-  x5y2: '',
-  x6y2: '',
-  x7y2: '',
-  x0y3: '',
-  x1y3: '',
-  x2y3: '',
-  x3y3: '',
-  x4y3: '',
-  x5y3: '',
-  x6y3: '',
-  x7y3: '',
-  x0y4: '',
-  x1y4: '',
-  x2y4: '',
-  x3y4: '',
-  x4y4: '',
-  x5y4: '',
-  x6y4: '',
-  x7y4: '',
-  x0y5: '',
-  x1y5: '',
-  x2y5: '',
-  x3y5: '',
-  x4y5: '',
-  x5y5: '',
-  x6y5: '',
-  x7y5: '',
-  x0y6: '',
-  x1y6: '',
-  x2y6: '',
-  x3y6: '',
-  x4y6: '',
-  x5y6: '',
-  x6y6: '',
-  x7y6: '',
-  x0y7: '',
-  x1y7: '',
-  x2y7: '',
-  x3y7: '',
-  x4y7: '',
-  x5y7: '',
-  x6y7: '',
-  x7y7: '',
+  x1y0: 'x1y2',
+  x2y0: 'x0y0',
+  x3y0: 'x1y0',
+  x4y0: 'x6y0',
+  x5y0: 'x7y0',
+  x6y0: 'x6y2',
+  x7y0: 'x7y2',
+  x0y1: 'x0y3',
+  x1y1: 'x1y3',
+  x2y1: 'x0y1',
+  x3y1: 'x1y1',
+  x4y1: 'x6y1',
+  x5y1: 'x7y1',
+  x6y1: 'x6y3',
+  x7y1: 'x7y3',
+  x0y2: 'x2y2',
+  x1y2: 'x3y2',
+  x2y2: 'x2y0',
+  x3y2: 'x3y0',
+  x4y2: 'x4y0',
+  x5y2: 'x5y0',
+  x6y2: 'x4y2',
+  x7y2: 'x5y2',
+  x0y3: 'x2y3',
+  x1y3: 'x3y3',
+  x2y3: 'x2y1',
+  x3y3: 'x3y1',
+  x4y3: 'x4y1',
+  x5y3: 'x5y1',
+  x6y3: 'x4y3',
+  x7y3: 'x5y3',
+  x0y4: 'x0y6',
+  x1y4: 'x1y6',
+  x2y4: 'x0y4',
+  x3y4: 'x1y4',
+  x4y4: 'x6y4',
+  x5y4: 'x7y4',
+  x6y4: 'x6y6',
+  x7y4: 'x7y6',
+  x0y5: 'x0y7',
+  x1y5: 'x1y7',
+  x2y5: 'x0y5',
+  x3y5: 'x1y5',
+  x4y5: 'x6y5',
+  x5y5: 'x7y5',
+  x6y5: 'x6y7',
+  x7y5: 'x7y7',
+  x0y6: 'x2y6',
+  x1y6: 'x3y6',
+  x2y6: 'x2y4',
+  x3y6: 'x3y4',
+  x4y6: 'x4y4',
+  x5y6: 'x5y4',
+  x6y6: 'x4y6',
+  x7y6: 'x5y6',
+  x0y7: 'x2y7',
+  x1y7: 'x3y7',
+  x2y7: 'x2y5',
+  x3y7: 'x3y5',
+  x4y7: 'x4y5',
+  x5y7: 'x5y5',
+  x6y7: 'x4y7',
+  x7y7: 'x5y7',
 };
 
 //-----------------------------------------------------------------------
 //INITIALIZATION
 //Check screen size, generate the table and init Smapon
 
+
 function init() {
 
-  // checkScreenSize();
+   checkScreenSize();
   // displayIntroContent();
 
       addTouchListeners(TOUCH_LISTENER_DIV);
@@ -208,6 +209,18 @@ function init() {
 
 }
 
+function checkScreenSize(){
+  var windowWidth = document.documentElement.clientWidth;
+  var windowHeight = document.body.clientHeight *0.8;
+  var mainContent = document.getElementById('mainContent');
+  var SmaponWindowRatio = 16/9;
+
+    debugMode(windowHeight + ' ' + windowWidth);
+  mainContent.style.width=(windowHeight/SmaponWindowRatio);
+  mainContent.style.height=windowHeight;
+
+    debugMode(' <br>'+mainContent.style.height + ' ' + mainContent.style.width);
+}
 
 //-----------------------------------------------------------------------
 //SMAPON
@@ -270,7 +283,6 @@ Smapon.create.prototype.createGrid = function() {
   Smapon.create.prototype.setAnimationTo = function(animList){
     if(animList.length >= 1){
 
-      console.log(animList.pattern);
       setNewPattern(facePatterns[animList[0].pattern]);
       setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
     }
@@ -316,20 +328,39 @@ window.speechSynthesis.speak(msg);
 //Should this be inside Smapon? I'm lost.
 
 function setNewPattern(patternArray){
-  console.log(patternArray);
-for (var i = 0; i < TABLE_SIZE; i++) {
+  for (var i = 0; i < TABLE_SIZE; i++) {
 
-  for (var j = 0; j < TABLE_SIZE; j++) {
-    if (patternArray[i][j] === ' ') {
-      document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
-    } else {
+    for (var j = 0; j < TABLE_SIZE; j++) {
+      if (patternArray[i][j] === ' ') {
+        document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
+      } else {
 
-    document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
+      document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
+      }
     }
   }
 }
 
+function setNewPatternandTranslate(patternArray){
+  console.log(patternArray);
 
+  for (var i = 0; i < TABLE_SIZE; i++) {
+    for (var j = 0; j < TABLE_SIZE; j++) {
+
+        var currentID = 'x'+j+'y'+i;
+        var translatedID = translationGrid[currentID];
+        var newX = translatedID[1];
+        var newY = translatedID[3];
+        console.log(newX +' '+newY);
+
+      if (patternArray[i][j] === ' ') {
+        document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST.none;
+      } else {
+
+      document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST[patternArray[i][j]];
+      }
+    }
+  }
 }
 
 
@@ -468,9 +499,17 @@ for (var i = 0; i < nb_of_th; i++) {
 
 
   function debugMode(string){
-    document.getElementById('debugdiv').innerHTML += string;
-    console.log(string);
+    var debugdiv = document.getElementById('debugdiv');
+
+    if (DEBUGMODE === true){
+      debugdiv.style.visibility = 'visible';
+      debugdiv.innerHTML += string;
+      console.log(string);
+    } else {
+    debugdiv.style.visibility = 'hidden';
+    }
   }
+
   function humanToSmapon(){
     console.log('pouet');
   }
