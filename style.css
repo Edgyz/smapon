@@ -38,12 +38,3 @@ button {
 }
 
 /*----------specific to Smapon -----------*/
-
-
-input {font-size: 1.1em;}
-
-#touchtable {
-  position:absolute;
-  left:150px;
-  top:150px;
-}
