@@ -317,6 +317,14 @@ Smapon.create.prototype.createGrid = function() {
 };
 
 
+
+  Smapon.create.prototype.createMenu = function(){
+    
+};
+
+
+
+
 Smapon.create.prototype.saySomethingVoice = function(something,lang){
   var msg = new SpeechSynthesisUtterance(something);
 
@@ -541,8 +549,4 @@ for (var i = 0; i < nb_of_th; i++) {
     } else {
     debugdiv.style.visibility = 'hidden';
     }
-  }
-
-  function humanToSmapon(){
-    console.log('pouet');
   }
