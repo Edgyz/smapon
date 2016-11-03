@@ -1,6 +1,7 @@
-//missing:
+//TO DO:
 // adding a touch check all the time (setinterval?)
-// where would color functions be ?
+//add a bouton switchting to a new routine
+// but also what IS a routine? ????
 
 //-----------------------------------------------------------------------
 //GLOBAL VARIABLES
@@ -12,7 +13,8 @@ var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
 var ANIM_FREQ = 300;
-
+var DEBUGMODE = true;
+var ISTRANSLATING = false;
 
   //color choices as follows:
   var COLORS_LIST =
@@ -28,40 +30,7 @@ var ANIM_FREQ = 300;
     none : 'rgb(0, 0, 0)'
     };
 
-
-//-----------------------------------------------------------------------
-//INITIALIZATION
-//Check screen size, generate the table and init Smapon
-
-function init() {
-
-  // checkScreenSize();
-  // displayIntroContent();
-
-  addTouchListeners(TOUCH_LISTENER_DIV);
-  generateTable();
-  resizingSquares(20);
-  moveTableTo((window.innerWidth/2),200,0);
-  setNewPattern(facePatterns.surprise);
-  mySmapon.routine('idle');
-  //Check for input for 3sec ?
-  //
-  // if(TouchedFor3sec() === true){
-  //   createSmapon();
-  // }
-
-}
-
-
-//-----------------------------------------------------------------------
-//SMAPON
-//TBD But I think at the root level there might be stats (like hunger or whatever)
-// and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
-//
-// var routineAnimList =
-// { idle: ['smile','eyesclosed','smile','smile','smile'],
-//   smile: ['smile','eyesopen']
-// };
+//ANIMATION VARIABLES
 
 var routineAnimList =
 { idle:
@@ -74,7 +43,32 @@ var routineAnimList =
     {pattern:'eyesclosed',duration:1},
     {pattern:'lookright',duration:6},
     {pattern:'smile',duration:3},
-  ]
+  ],
+  blink:
+    [
+      {pattern:'smile',duration:2},
+      {pattern:'eyesclosed',duration:1},
+      {pattern:'smile',duration:1},
+      {pattern:'eyesclosed',duration:1},
+      {pattern:'smile',duration:1},
+      {pattern:'eyesclosed',duration:1},
+    ],
+
+    talk:
+      [
+        {pattern:'smile',duration:2},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'smile',duration:10},
+      ]
 };
 
 var facePatterns =
@@ -88,6 +82,15 @@ var facePatterns =
       "  b  b  ",
       "   bb   ",
       "        "],
+        mouthopen:
+           ["        ",
+            "  b  b  ",
+            "  b  b  ",
+            "        ",
+            "        ",
+            "  bbbb  ",
+            "   bb   ",
+            "        "],
   lookleft:
      ["        ",
       " b  b   ",
@@ -139,26 +142,192 @@ surprise:
 
 };
 
-  var mySmapon = {};
+var translationGrid =
+{
+  x0y0: 'x0y2',
+  x1y0: 'x1y2',
+  x2y0: 'x0y0',
+  x3y0: 'x1y0',
+  x4y0: 'x6y0',
+  x5y0: 'x7y0',
+  x6y0: 'x6y2',
+  x7y0: 'x7y2',
+  x0y1: 'x0y3',
+  x1y1: 'x1y3',
+  x2y1: 'x0y1',
+  x3y1: 'x1y1',
+  x4y1: 'x6y1',
+  x5y1: 'x7y1',
+  x6y1: 'x6y3',
+  x7y1: 'x7y3',
+  x0y2: 'x2y2',
+  x1y2: 'x3y2',
+  x2y2: 'x2y0',
+  x3y2: 'x3y0',
+  x4y2: 'x4y0',
+  x5y2: 'x5y0',
+  x6y2: 'x4y2',
+  x7y2: 'x5y2',
+  x0y3: 'x2y3',
+  x1y3: 'x3y3',
+  x2y3: 'x2y1',
+  x3y3: 'x3y1',
+  x4y3: 'x4y1',
+  x5y3: 'x5y1',
+  x6y3: 'x4y3',
+  x7y3: 'x5y3',
+  x0y4: 'x0y6',
+  x1y4: 'x1y6',
+  x2y4: 'x0y4',
+  x3y4: 'x1y4',
+  x4y4: 'x6y4',
+  x5y4: 'x7y4',
+  x6y4: 'x6y6',
+  x7y4: 'x7y6',
+  x0y5: 'x0y7',
+  x1y5: 'x1y7',
+  x2y5: 'x0y5',
+  x3y5: 'x1y5',
+  x4y5: 'x6y5',
+  x5y5: 'x7y5',
+  x6y5: 'x6y7',
+  x7y5: 'x7y7',
+  x0y6: 'x2y6',
+  x1y6: 'x3y6',
+  x2y6: 'x2y4',
+  x3y6: 'x3y4',
+  x4y6: 'x4y4',
+  x5y6: 'x5y4',
+  x6y6: 'x4y6',
+  x7y6: 'x5y6',
+  x0y7: 'x2y7',
+  x1y7: 'x3y7',
+  x2y7: 'x2y5',
+  x3y7: 'x3y5',
+  x4y7: 'x4y5',
+  x5y7: 'x5y5',
+  x6y7: 'x4y7',
+  x7y7: 'x5y7',
+};
 
-  mySmapon.routine =
-  function(routineName){ //i.e. 'idle'
-    this.animate(routineAnimList[routineName]);
+//-----------------------------------------------------------------------
+//INITIALIZATION
+//Check screen size, generate the table and init Smapon
+
+
+function init() {
+
+   checkScreenSize();
+  // displayIntroContent();
+
+      addTouchListeners(TOUCH_LISTENER_DIV);
+      var mySmapopon = new Smapon.create('JeanClaude');
+      mySmapopon.createGrid();
+      mySmapopon.moveGrid();
+      mySmapopon.setRoutineTo('talk');
+      mySmapopon.saySomethingVoice('Bonne fete Hubert Sama, watashi wa john san desu','en-GB');
+  //Check for input for 3sec ?
+  //
+  // if(TouchedFor3sec() === true){
+  //   createSmapon();
+  // }
+
+}
+
+function checkScreenSize(){
+  var windowWidth = document.documentElement.clientWidth;
+  var windowHeight = document.body.clientHeight *0.8;
+  var mainContent = document.getElementById('mainContent');
+  var SmaponWindowRatio = 16/9;
+
+    debugMode(windowHeight + ' ' + windowWidth);
+  mainContent.style.width=(windowHeight/SmaponWindowRatio);
+  mainContent.style.height=windowHeight;
+
+    debugMode(' <br>'+mainContent.style.height + ' ' + mainContent.style.width);
+}
+
+//-----------------------------------------------------------------------
+//SMAPON
+//TBD But I think at the root level there might be stats (like hunger or whatever)
+// and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
+//
+// var routineAnimList =
+// { idle: ['smile','eyesclosed','smile','smile','smile'],
+//   smile: ['smile','eyesopen']
+// };
+
+var Smapon = {};
+Smapon.create = function (name){
+  this.name = 'name';
   };
 
-  mySmapon.animate =
-  function(animList){
+Smapon.create.prototype.createGrid = function() {
 
+
+    var myTable ='<table id="'+SMAPON_TABLE_ID+'">';
+
+    for (var i = 0; i < TABLE_SIZE; i++) {
+      myTable += '<tr class="row'+i+'">';
+      myTable += generateTh(TABLE_SIZE,i);
+      myTable += "</tr>";
+    }
+    myTable += "</table>";
+    document.getElementById(TABLE_DIV).innerHTML = myTable;
+    resizingSquares(SQUARE_PX_SIZE);
+
+};
+
+
+  Smapon.create.prototype.resizeSquares = function(pxsize) {
+    resizingSquares(pxsize);
+
+  };
+
+  Smapon.create.prototype.moveGrid = function() {
+
+      moveTableTo((window.innerWidth/2),200,0);
+
+  };
+
+  Smapon.create.prototype.setPatternTo = function(facePattern) {
+
+      setNewPattern(facePatterns.surprise);
+
+  };
+
+  Smapon.create.prototype.setRoutineTo = function(routinename) {
+
+      this.routine = routinename;
+      this.setAnimationTo(routineAnimList[routinename]);
+
+  };
+
+
+
+  Smapon.create.prototype.setAnimationTo = function(animList){
     if(animList.length >= 1){
 
-      console.log(animList.pattern);
-        setNewPattern(facePatterns[animList[0].pattern]);
-        setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
+      setNewPattern(facePatterns[animList[0].pattern]);
+      setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
     }
     else {
       setNewPattern(facePatterns[animList[0].pattern]);
     }
-  };
+};
+
+
+Smapon.create.prototype.saySomethingVoice = function(something,lang){
+  var msg = new SpeechSynthesisUtterance(something);
+
+  msg.volume = 1; // 0 to 1
+  msg.rate = 1; // 0.1 to 10
+  msg.pitch = 2; //0 to 2
+  msg.lang = lang;
+window.speechSynthesis.speak(msg);
+};
+
+
 
   function nextFrame(animList,currentframe){
     var nextframe = 0;
@@ -178,37 +347,53 @@ surprise:
 }
 
 
+
 //-----------------------------------------------------------------------
 //ANIMATION
 //Should this be inside Smapon? I'm lost.
 
-var blueSmileFace=
-  [
-    "        ",
-    "  b  b  ",
-    "  b  b  ",
-    "        ",
-    "        ",
-    "  b  b  ",
-    "   bb   ",
-    "        "
-  ];
-
 function setNewPattern(patternArray){
-  console.log(patternArray);
-for (var i = 0; i < TABLE_SIZE; i++) {
 
-  for (var j = 0; j < TABLE_SIZE; j++) {
-    if (patternArray[i][j] === ' ') {
-      document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
-    } else {
+  for (var i = 0; i < TABLE_SIZE; i++) {
 
-    document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
+    for (var j = 0; j < TABLE_SIZE; j++) {
+      var currentID = 'x'+j+'y'+i;
+      var newID ='';
+      if(ISTRANSLATING === true){
+        newID = translationGrid[currentID];
+      } else {
+        newID = currentID;}
+
+      var newX = newID[1];
+      var newY = newID[3];
+
+
+
+      if (patternArray[i][j] === ' ') {
+        document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST.none;
+      } else {
+
+      document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST[patternArray[i][j]];
+      }
     }
   }
 }
 
+function setNewPatternandTranslate(patternArray){
+  console.log(patternArray);
 
+  for (var i = 0; i < TABLE_SIZE; i++) {
+    for (var j = 0; j < TABLE_SIZE; j++) {
+
+
+      if (patternArray[i][j] === ' ') {
+        document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST.none;
+      } else {
+
+      document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST[patternArray[i][j]];
+      }
+    }
+  }
 }
 
 
@@ -309,17 +494,6 @@ return(Math.atan(Opp/Adj)*180/Math.PI);
 //////
 
 function generateTable(){
-
-  var myTable ='<table id="'+SMAPON_TABLE_ID+'">';
-
-  for (var i = 0; i < TABLE_SIZE; i++) {
-    myTable += '<tr class="row'+i+'">';
-    myTable += generateTh(TABLE_SIZE,i);
-    myTable += "</tr>";
-  }
-  myTable += "</table>";
-  document.getElementById(TABLE_DIV).innerHTML = myTable;
-  resizingSquares(SQUARE_PX_SIZE);
 }
 
 
@@ -358,9 +532,17 @@ for (var i = 0; i < nb_of_th; i++) {
 
 
   function debugMode(string){
-    document.getElementById('debugdiv').innerHTML += string;
-    console.log(string);
+    var debugdiv = document.getElementById('debugdiv');
+
+    if (DEBUGMODE === true){
+      debugdiv.style.visibility = 'visible';
+      debugdiv.innerHTML += string;
+      console.log(string);
+    } else {
+    debugdiv.style.visibility = 'hidden';
+    }
   }
+
   function humanToSmapon(){
     console.log('pouet');
   }
