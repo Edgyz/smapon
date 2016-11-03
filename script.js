@@ -3,36 +3,42 @@
 //add a bouton switchting to a new routine
 // but also what IS a routine? ????
 
+//Fix size problems/resizing with window / relative sizes in CSS...
+//can I put variables in my css like that dude on codepen?
+
+
 //-----------------------------------------------------------------------
 //GLOBAL VARIABLES
 
 var TABLE_DIV = 'tablediv'; //the div we'll put Smapon's grid in
-var TABLE_SIZE = 8;
-var TOUCH_LISTENER_DIV = 'toucharea';
+var TABLE_SIZE = 8; // how many squares in the table (8 x 8)
+var TOUCH_LISTENER_DIV = 'toucharea'; //where touch input will be recorded
 var TABLE_TH_CSS_CLASS = 'tableth';
 var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
-var ANIM_FREQ = 300;
+var ANIM_FREQ = 300; //multiplied by the number in AnimList
 var DEBUGMODE = true;
-var ISTRANSLATING = false;
+var ISTRANSLATING = false; //translating the grid for Smapon
 
-  //color choices as follows:
-  var COLORS_LIST =
-    {
-    red:'rgb(245, 52, 10)',
-    o:'rgb(245, 137, 10)',
-    yellow:'rgb(245, 242, 10)',
-    green:'rgb(57, 245, 10)',
-    cyan:'rgb(10, 188, 245)',
-    b:'rgb(10, 69, 245)',
-    purple:'rgb(155, 10, 245)',
-    pink:'rgb(245, 10, 207)',
-    none : 'rgb(0, 0, 0)'
-    };
+//color choices for the squares as follows, use the letter in the grid
+var COLORS_LIST =
+  {
+  r:'rgb(245, 52, 10)',
+  o:'rgb(245, 137, 10)',
+  y:'rgb(245, 242, 10)',
+  g:'rgb(57, 245, 10)',
+  c:'rgb(10, 188, 245)',
+  b:'rgb(10, 69, 245)',
+  p:'rgb(155, 10, 245)',
+  k:'rgb(245, 10, 207)',
+  none : 'rgb(0, 0, 0)'
+  };
 
-//ANIMATION VARIABLES
+//------------------------
+//ANIMATION GOBAL VARS
+//------------------------
 
-var routineAnimList =
+var ANIMATION_LIST =
 { idle:
   [
     {pattern:'smile',duration:2},
@@ -54,24 +60,24 @@ var routineAnimList =
       {pattern:'eyesclosed',duration:1},
     ],
 
-    talk:
-      [
-        {pattern:'smile',duration:2},
-        {pattern:'mouthopen',duration:1},
-        {pattern:'surprise',duration:1},
-        {pattern:'mouthopen',duration:1},
-        {pattern:'surprise',duration:1},
-        {pattern:'mouthopen',duration:1},
-        {pattern:'surprise',duration:1},
-        {pattern:'mouthopen',duration:1},
-        {pattern:'surprise',duration:1},
-        {pattern:'mouthopen',duration:1},
-        {pattern:'surprise',duration:1},
-        {pattern:'smile',duration:10},
-      ]
+  talk:
+    [
+      {pattern:'smile',duration:2},
+      {pattern:'mouthopen',duration:1},
+      {pattern:'surprise',duration:1},
+      {pattern:'mouthopen',duration:1},
+      {pattern:'surprise',duration:1},
+      {pattern:'mouthopen',duration:1},
+      {pattern:'surprise',duration:1},
+      {pattern:'mouthopen',duration:1},
+      {pattern:'surprise',duration:1},
+      {pattern:'mouthopen',duration:1},
+      {pattern:'surprise',duration:1},
+      {pattern:'smile',duration:10},
+    ]
 };
 
-var facePatterns =
+var FACE_PATTERNS =
 {
   smile:
      ["        ",
@@ -82,15 +88,15 @@ var facePatterns =
       "  b  b  ",
       "   bb   ",
       "        "],
-        mouthopen:
-           ["        ",
-            "  b  b  ",
-            "  b  b  ",
-            "        ",
-            "        ",
-            "  bbbb  ",
-            "   bb   ",
-            "        "],
+  mouthopen:
+     ["        ",
+      "  b  b  ",
+      "  b  b  ",
+      "        ",
+      "        ",
+      "  bbbb  ",
+      "   bb   ",
+      "        "],
   lookleft:
      ["        ",
       " b  b   ",
@@ -142,97 +148,22 @@ surprise:
 
 };
 
-var translationGrid =
+var TRANSLATION_GRID =
 {
-  x0y0: 'x0y2',
-  x1y0: 'x1y2',
-  x2y0: 'x0y0',
-  x3y0: 'x1y0',
-  x4y0: 'x6y0',
-  x5y0: 'x7y0',
-  x6y0: 'x6y2',
-  x7y0: 'x7y2',
-  x0y1: 'x0y3',
-  x1y1: 'x1y3',
-  x2y1: 'x0y1',
-  x3y1: 'x1y1',
-  x4y1: 'x6y1',
-  x5y1: 'x7y1',
-  x6y1: 'x6y3',
-  x7y1: 'x7y3',
-  x0y2: 'x2y2',
-  x1y2: 'x3y2',
-  x2y2: 'x2y0',
-  x3y2: 'x3y0',
-  x4y2: 'x4y0',
-  x5y2: 'x5y0',
-  x6y2: 'x4y2',
-  x7y2: 'x5y2',
-  x0y3: 'x2y3',
-  x1y3: 'x3y3',
-  x2y3: 'x2y1',
-  x3y3: 'x3y1',
-  x4y3: 'x4y1',
-  x5y3: 'x5y1',
-  x6y3: 'x4y3',
-  x7y3: 'x5y3',
-  x0y4: 'x0y6',
-  x1y4: 'x1y6',
-  x2y4: 'x0y4',
-  x3y4: 'x1y4',
-  x4y4: 'x6y4',
-  x5y4: 'x7y4',
-  x6y4: 'x6y6',
-  x7y4: 'x7y6',
-  x0y5: 'x0y7',
-  x1y5: 'x1y7',
-  x2y5: 'x0y5',
-  x3y5: 'x1y5',
-  x4y5: 'x6y5',
-  x5y5: 'x7y5',
-  x6y5: 'x6y7',
-  x7y5: 'x7y7',
-  x0y6: 'x2y6',
-  x1y6: 'x3y6',
-  x2y6: 'x2y4',
-  x3y6: 'x3y4',
-  x4y6: 'x4y4',
-  x5y6: 'x5y4',
-  x6y6: 'x4y6',
-  x7y6: 'x5y6',
-  x0y7: 'x2y7',
-  x1y7: 'x3y7',
-  x2y7: 'x2y5',
-  x3y7: 'x3y5',
-  x4y7: 'x4y5',
-  x5y7: 'x5y5',
-  x6y7: 'x4y7',
-  x7y7: 'x5y7',
+  x0y0: 'x0y2',  x1y0: 'x1y2',  x2y0: 'x0y0',  x3y0: 'x1y0',  x4y0: 'x6y0',  x5y0: 'x7y0',  x6y0: 'x6y2',  x7y0: 'x7y2',
+  x0y1: 'x0y3',  x1y1: 'x1y3',  x2y1: 'x0y1',  x3y1: 'x1y1',  x4y1: 'x6y1',  x5y1: 'x7y1',  x6y1: 'x6y3',  x7y1: 'x7y3',
+  x0y2: 'x2y2',  x1y2: 'x3y2',  x2y2: 'x2y0',  x3y2: 'x3y0',  x4y2: 'x4y0',  x5y2: 'x5y0',  x6y2: 'x4y2',  x7y2: 'x5y2',
+  x0y3: 'x2y3',  x1y3: 'x3y3',  x2y3: 'x2y1',  x3y3: 'x3y1',  x4y3: 'x4y1',  x5y3: 'x5y1',  x6y3: 'x4y3',  x7y3: 'x5y3',
+  x0y4: 'x0y6',  x1y4: 'x1y6',  x2y4: 'x0y4',  x3y4: 'x1y4',  x4y4: 'x6y4',  x5y4: 'x7y4',  x6y4: 'x6y6',  x7y4: 'x7y6',
+  x0y5: 'x0y7',  x1y5: 'x1y7',  x2y5: 'x0y5',  x3y5: 'x1y5',  x4y5: 'x6y5',  x5y5: 'x7y5',  x6y5: 'x6y7',  x7y5: 'x7y7',
+  x0y6: 'x2y6',  x1y6: 'x3y6',  x2y6: 'x2y4',  x3y6: 'x3y4',  x4y6: 'x4y4',  x5y6: 'x5y4',  x6y6: 'x4y6',  x7y6: 'x5y6',
+  x0y7: 'x2y7',  x1y7: 'x3y7',  x2y7: 'x2y5',  x3y7: 'x3y5',  x4y7: 'x4y5',  x5y7: 'x5y5',  x6y7: 'x4y7',  x7y7: 'x5y7',
 };
 
 //-----------------------------------------------------------------------
 //INITIALIZATION
-//Check screen size, generate the table and init Smapon
 
 
-function init() {
-
-   checkScreenSize();
-  // displayIntroContent();
-
-      addTouchListeners(TOUCH_LISTENER_DIV);
-      var mySmapopon = new Smapon.create('JeanClaude');
-      mySmapopon.createGrid();
-      mySmapopon.moveGrid();
-      mySmapopon.setRoutineTo('talk');
-      mySmapopon.saySomethingVoice('Bonne fete Hubert Sama, watashi wa john san desu','en-GB');
-  //Check for input for 3sec ?
-  //
-  // if(TouchedFor3sec() === true){
-  //   createSmapon();
-  // }
-
-}
 window.onresize = checkScreenSize;
 
 function checkScreenSize(){
@@ -259,7 +190,7 @@ function checkScreenSize(){
 //TBD But I think at the root level there might be stats (like hunger or whatever)
 // and routines (i.e. IDLE) that contain all behavior (i.e. talk, animation, logic)
 //
-// var routineAnimList =
+// var ANIMATION_LIST =
 // { idle: ['smile','eyesclosed','smile','smile','smile'],
 //   smile: ['smile','eyesopen']
 // };
@@ -267,6 +198,8 @@ function checkScreenSize(){
 var Smapon = {};
 Smapon.create = function (name){
   this.name = 'name';
+    checkScreenSize();
+    addTouchListeners(TOUCH_LISTENER_DIV);
   };
 
 Smapon.create.prototype.createGrid = function() {
@@ -299,14 +232,14 @@ Smapon.create.prototype.createGrid = function() {
 
   Smapon.create.prototype.setPatternTo = function(facePattern) {
 
-      setNewPattern(facePatterns.surprise);
+      setNewPattern(FACE_PATTERNS.surprise);
 
   };
 
   Smapon.create.prototype.setRoutineTo = function(routinename) {
 
       this.routine = routinename;
-      this.setAnimationTo(routineAnimList[routinename]);
+      this.setAnimationTo(ANIMATION_LIST[routinename]);
 
   };
 
@@ -315,11 +248,11 @@ Smapon.create.prototype.createGrid = function() {
   Smapon.create.prototype.setAnimationTo = function(animList){
     if(animList.length >= 1){
 
-      setNewPattern(facePatterns[animList[0].pattern]);
+      setNewPattern(FACE_PATTERNS[animList[0].pattern]);
       setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
     }
     else {
-      setNewPattern(facePatterns[animList[0].pattern]);
+      setNewPattern(FACE_PATTERNS[animList[0].pattern]);
     }
 };
 
@@ -356,7 +289,7 @@ window.speechSynthesis.speak(msg);
     nextframe = currentframe +1;
     }
 
-    setNewPattern(facePatterns[animList[nextframe].pattern]);
+    setNewPattern(FACE_PATTERNS[animList[nextframe].pattern]);
     setTimeout(function(){nextFrame(animList,nextframe);},animList[nextframe].duration*ANIM_FREQ);
 
 }
@@ -375,7 +308,7 @@ function setNewPattern(patternArray){
       var currentID = 'x'+j+'y'+i;
       var newID ='';
       if(ISTRANSLATING === true){
-        newID = translationGrid[currentID];
+        newID = TRANSLATION_GRID[currentID];
       } else {
         newID = currentID;}
 
