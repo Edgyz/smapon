@@ -233,6 +233,7 @@ function init() {
   // }
 
 }
+window.onresize = checkScreenSize;
 
 function checkScreenSize(){
   var windowWidth = document.documentElement.clientWidth;
@@ -243,6 +244,12 @@ function checkScreenSize(){
     debugMode(windowHeight + ' ' + windowWidth);
   mainContent.style.width=(windowHeight/SmaponWindowRatio);
   mainContent.style.height=windowHeight;
+
+          document.getElementById('menudiv').style.width=(windowHeight/SmaponWindowRatio)*0.97;
+            document.getElementById('menudiv').style.top=windowHeight*0.75;
+              document.getElementById('menudiv').style.height=windowHeight*0.22;
+                document.getElementById('buttonline1').style.height=windowHeight*0.12;
+                  document.getElementById('buttonline2').style.height=windowHeight*0.12;
 
     debugMode(' <br>'+mainContent.style.height + ' ' + mainContent.style.width);
 }
@@ -318,8 +325,8 @@ Smapon.create.prototype.createGrid = function() {
 
 
 
-  Smapon.create.prototype.createMenu = function(){
-    
+  Smapon.create.prototype.saySomethingText = function(){
+
 };
 
 
