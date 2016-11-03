@@ -1,7 +1,7 @@
 //TO DO:
 // adding a touch check all the time (setinterval?)
-// merge setnewpattern & setNewPatternandTranslate into
-//one function and set translation on/off based on ISTRANSLATING
+//add a bouton switchting to a new routine
+// but also what IS a routine? ????
 
 //-----------------------------------------------------------------------
 //GLOBAL VARIABLES
@@ -14,7 +14,7 @@ var SQUARE_PX_SIZE = 18;
 var SMAPON_TABLE_ID = 'smapongrid';
 var ANIM_FREQ = 300;
 var DEBUGMODE = true;
-var ISTRANSLATING = true;
+var ISTRANSLATING = false;
 
   //color choices as follows:
   var COLORS_LIST =
@@ -52,7 +52,23 @@ var routineAnimList =
       {pattern:'eyesclosed',duration:1},
       {pattern:'smile',duration:1},
       {pattern:'eyesclosed',duration:1},
-    ]
+    ],
+
+    talk:
+      [
+        {pattern:'smile',duration:2},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'mouthopen',duration:1},
+        {pattern:'surprise',duration:1},
+        {pattern:'smile',duration:10},
+      ]
 };
 
 var facePatterns =
@@ -66,6 +82,15 @@ var facePatterns =
       "  b  b  ",
       "   bb   ",
       "        "],
+        mouthopen:
+           ["        ",
+            "  b  b  ",
+            "  b  b  ",
+            "        ",
+            "        ",
+            "  bbbb  ",
+            "   bb   ",
+            "        "],
   lookleft:
      ["        ",
       " b  b   ",
@@ -199,10 +224,8 @@ function init() {
       var mySmapopon = new Smapon.create('JeanClaude');
       mySmapopon.createGrid();
       mySmapopon.moveGrid();
-      mySmapopon.setRoutineTo('blink');
-      mySmapopon.saySomethingVoice('konnichiwa,ヒューバート様.');
-      mySmapopon.saySomethingVoice('私,スマポントイイマス.');
-      mySmapopon.saySomethingVoice('おしり の なか に ゆび お いりますか? ');
+      mySmapopon.setRoutineTo('talk');
+      mySmapopon.saySomethingVoice('Bonne fete Hubert Sama, watashi wa john san desu','en-GB');
   //Check for input for 3sec ?
   //
   // if(TouchedFor3sec() === true){
@@ -285,22 +308,22 @@ Smapon.create.prototype.createGrid = function() {
   Smapon.create.prototype.setAnimationTo = function(animList){
     if(animList.length >= 1){
 
-      setNewPatternandTranslate(facePatterns[animList[0].pattern]);
+      setNewPattern(facePatterns[animList[0].pattern]);
       setTimeout(function(){nextFrame(animList,0);},animList[0].duration*ANIM_FREQ);
     }
     else {
-      setNewPatternandTranslate(facePatterns[animList[0].pattern]);
+      setNewPattern(facePatterns[animList[0].pattern]);
     }
 };
 
 
-Smapon.create.prototype.saySomethingVoice = function(something){
+Smapon.create.prototype.saySomethingVoice = function(something,lang){
   var msg = new SpeechSynthesisUtterance(something);
 
   msg.volume = 1; // 0 to 1
   msg.rate = 1; // 0.1 to 10
   msg.pitch = 2; //0 to 2
-  msg.lang = 'ja';
+  msg.lang = lang;
 window.speechSynthesis.speak(msg);
 };
 
@@ -318,7 +341,7 @@ window.speechSynthesis.speak(msg);
     nextframe = currentframe +1;
     }
 
-    setNewPatternandTranslate(facePatterns[animList[nextframe].pattern]);
+    setNewPattern(facePatterns[animList[nextframe].pattern]);
     setTimeout(function(){nextFrame(animList,nextframe);},animList[nextframe].duration*ANIM_FREQ);
 
 }
@@ -330,14 +353,27 @@ window.speechSynthesis.speak(msg);
 //Should this be inside Smapon? I'm lost.
 
 function setNewPattern(patternArray){
+
   for (var i = 0; i < TABLE_SIZE; i++) {
 
     for (var j = 0; j < TABLE_SIZE; j++) {
+      var currentID = 'x'+j+'y'+i;
+      var newID ='';
+      if(ISTRANSLATING === true){
+        newID = translationGrid[currentID];
+      } else {
+        newID = currentID;}
+
+      var newX = newID[1];
+      var newY = newID[3];
+
+
+
       if (patternArray[i][j] === ' ') {
-        document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST.none;
+        document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST.none;
       } else {
 
-      document.getElementById('x'+j+'y'+i).style.background = COLORS_LIST[patternArray[i][j]];
+      document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST[patternArray[i][j]];
       }
     }
   }
@@ -349,11 +385,6 @@ function setNewPatternandTranslate(patternArray){
   for (var i = 0; i < TABLE_SIZE; i++) {
     for (var j = 0; j < TABLE_SIZE; j++) {
 
-        var currentID = 'x'+j+'y'+i;
-        var translatedID = translationGrid[currentID];
-        var newX = translatedID[1];
-        var newY = translatedID[3];
-        console.log(newX +' '+newY);
 
       if (patternArray[i][j] === ' ') {
         document.getElementById('x'+newX+'y'+newY).style.background = COLORS_LIST.none;
